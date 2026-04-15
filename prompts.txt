@@ -30,3 +30,12 @@ Generate a README file with setup instructions (How to run frontend and backend)
 Unit tests and coverage report
 Dockerfile to run frontend + backend together
 Save the propmts for this project in a txt file.
+
+Prompt 2:
+Apply the "Vibrant Palette" design theme to the app.
+
+Prompt 3:
+for the mobile view, collapse all the text (environment, features, description and core stack) and keep the calculator as the main component
+
+Prompt 4:
+On mobile vertical view, add an icon to show/hide the app information. On mobile horizontal view, make the calculator adjust to the size and don't show the vertical scrollbar
