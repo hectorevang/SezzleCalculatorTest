@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { motion } from "motion/react";
-import { Delete, Divide, Equal, Minus, Percent, Plus, RotateCcw, X } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { Delete, Divide, Equal, Info, Minus, Percent, Plus, RotateCcw, X } from "lucide-react";
 import { calculate, Operation } from "./services/calculatorService";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +12,7 @@ export default function App() {
   const [currentOperation, setCurrentOperation] = useState<Operation | null>(null);
   const [isWaitingForOperand, setIsWaitingForOperand] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
 
   const handleNumber = (num: string) => {
     if (error) clearAll();
@@ -121,58 +122,91 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#4F46E5] flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-[#4F46E5] flex items-center justify-center p-0 sm:p-4 font-sans overflow-hidden">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-[960px] h-auto lg:h-[680px] bg-white rounded-[24px] grid grid-cols-1 lg:grid-cols-[320px_1fr] overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)]"
+        className="w-full max-w-[960px] h-full sm:h-auto lg:h-[680px] bg-white sm:rounded-[24px] grid grid-cols-1 lg:grid-cols-[320px_1fr] overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] relative"
       >
-        {/* Sidebar */}
-        <aside className="bg-[#EEF2FF] p-10 border-r border-black/5 flex flex-col justify-between">
-          <div className="sidebar-top">
-            <div className="inline-block px-3 py-1 rounded-full bg-[#DBEAFE] text-[#1E40AF] text-[11px] font-bold uppercase mb-8">
-              Test Environment v1.0
-            </div>
-            <h1 className="text-2xl font-extrabold text-[#4F46E5] mb-2 tracking-tight">Sezzle Calc</h1>
-            <p className="text-sm text-[#64748B] leading-relaxed mb-8">
-              Full-stack arithmetic engine powered by a Go microservice and React frontend.
-            </p>
-            
-            <ul className="space-y-4">
-              {[
-                "Basic & Advanced Math",
-                "REST API Validation",
-                "Percentage Calculation",
-                "Exponentiation Support"
-              ].map((feature, i) => (
-                <li key={i} className="flex items-center text-[13px] font-medium text-[#1E293B]">
-                  <div className="w-[18px] h-[18px] bg-[#4F46E5] rounded-[4px] mr-3 flex items-center justify-center text-white text-[10px]">
-                    ✓
-                  </div>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Mobile Info Toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setShowInfo(!showInfo)}
+          className="absolute top-4 right-4 z-50 lg:hidden bg-white/10 hover:bg-white/20 backdrop-blur-sm text-[#4F46E5] rounded-full"
+        >
+          {showInfo ? <X className="w-6 h-6" /> : <Info className="w-6 h-6" />}
+        </Button>
 
-          <div className="sidebar-bottom mt-12 lg:mt-0">
-            <div className="mb-3 text-[11px] font-bold text-[#94A3B8] tracking-wider uppercase">CORE STACK</div>
-            <div className="flex flex-wrap gap-2">
-              {["React", "TypeScript", "Go", "Docker"].map(tech => (
-                <span key={tech} className="px-2 py-1 bg-[#E2E8F0] rounded-[4px] text-[10px] font-semibold text-[#475569]">
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </div>
-        </aside>
+        {/* Sidebar / Info Panel */}
+        <AnimatePresence>
+          {(showInfo || window.innerWidth >= 1024) && (
+            <motion.aside
+              initial={{ x: -320, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -320, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className={cn(
+                "bg-[#EEF2FF] p-10 border-r border-black/5 flex flex-col justify-between z-40",
+                "absolute inset-0 lg:relative lg:flex",
+                !showInfo && "hidden lg:flex"
+              )}
+            >
+              <div className="sidebar-top">
+                <div className="inline-block px-3 py-1 rounded-full bg-[#DBEAFE] text-[#1E40AF] text-[11px] font-bold uppercase mb-8">
+                  Test Environment v1.0
+                </div>
+                <h1 className="text-2xl font-extrabold text-[#4F46E5] mb-2 tracking-tight">Sezzle Calc</h1>
+                <p className="text-sm text-[#64748B] leading-relaxed mb-8">
+                  Full-stack arithmetic engine powered by a Go microservice and React frontend.
+                </p>
+                
+                <ul className="space-y-4">
+                  {[
+                    "Basic & Advanced Math",
+                    "REST API Validation",
+                    "Percentage Calculation",
+                    "Exponentiation Support"
+                  ].map((feature, i) => (
+                    <li key={i} className="flex items-center text-[13px] font-medium text-[#1E293B]">
+                      <div className="w-[18px] h-[18px] bg-[#4F46E5] rounded-[4px] mr-3 flex items-center justify-center text-white text-[10px]">
+                        ✓
+                      </div>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="sidebar-bottom mt-12 lg:mt-0">
+                <div className="mb-3 text-[11px] font-bold text-[#94A3B8] tracking-wider uppercase">CORE STACK</div>
+                <div className="flex flex-wrap gap-2">
+                  {["React", "TypeScript", "Go", "Docker"].map(tech => (
+                    <span key={tech} className="px-2 py-1 bg-[#E2E8F0] rounded-[4px] text-[10px] font-semibold text-[#475569]">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.aside>
+          )}
+        </AnimatePresence>
 
         {/* Main Content */}
-        <main className="flex items-center justify-center bg-gradient-to-br from-[#F8FAFC] to-[#F1F5F9] p-8">
-          <div className="w-full max-w-[340px] bg-[#1E293B] rounded-[32px] p-6 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.2)] border border-white/10">
+        <main className={cn(
+          "flex items-center justify-center bg-gradient-to-br from-[#F8FAFC] to-[#F1F5F9] p-4 sm:p-8 overflow-hidden",
+          "landscape:p-2"
+        )}>
+          <div className={cn(
+            "w-full max-w-[340px] bg-[#1E293B] rounded-[32px] p-4 sm:p-6 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.2)] border border-white/10 transition-all",
+            "landscape:max-w-[600px] landscape:grid landscape:grid-cols-[1fr_1.5fr] landscape:gap-4 landscape:p-4 landscape:rounded-[24px]"
+          )}>
             {/* Screen */}
-            <div className="bg-[#0F172A] rounded-[16px] p-5 text-right mb-6 border border-white/5 min-h-[100px] flex flex-col justify-end">
-              <div className="font-mono text-sm text-[#64748B] mb-1 min-h-[20px]">
+            <div className={cn(
+              "bg-[#0F172A] rounded-[16px] p-4 sm:p-5 text-right mb-4 sm:mb-6 border border-white/5 min-h-[80px] sm:min-h-[100px] flex flex-col justify-end",
+              "landscape:mb-0 landscape:h-full"
+            )}>
+              <div className="font-mono text-xs sm:text-sm text-[#64748B] mb-1 min-h-[16px] sm:min-h-[20px]">
                 {currentOperation && previousValue !== null ? (
                   `${previousValue} ${currentOperation === "add" ? "+" : 
                                      currentOperation === "subtract" ? "-" : 
@@ -182,21 +216,25 @@ export default function App() {
                 ) : ""}
               </div>
               <div className={cn(
-                "font-mono text-4xl text-[#F8FAFC] font-medium tracking-tighter break-all",
-                error ? "text-red-400 text-xl" : ""
+                "font-mono text-3xl sm:text-4xl text-[#F8FAFC] font-medium tracking-tighter break-all",
+                error ? "text-red-400 text-lg sm:text-xl" : ""
               )}>
                 {error || display}
               </div>
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-4 gap-3">
+            <div className={cn(
+              "grid grid-cols-4 gap-2 sm:gap-3",
+              "landscape:gap-2"
+            )}>
               {buttons.map((btn, idx) => (
                 <Button
                   key={idx}
                   onClick={btn.action}
                   className={cn(
-                    "h-[60px] rounded-[14px] text-lg font-semibold text-white border-none transition-all active:scale-95",
+                    "h-[50px] sm:h-[60px] rounded-[10px] sm:rounded-[14px] text-base sm:text-lg font-semibold text-white border-none transition-all active:scale-95",
+                    "landscape:h-[40px] landscape:text-sm",
                     btn.className
                   )}
                 >
@@ -205,7 +243,7 @@ export default function App() {
               ))}
             </div>
 
-            <div className="mt-5 text-center text-[10px] text-[#475569] font-bold tracking-[1px] uppercase">
+            <div className="mt-4 sm:mt-5 text-center text-[9px] sm:text-[10px] text-[#475569] font-bold tracking-[1px] uppercase landscape:hidden">
               Connection: 200 OK
             </div>
           </div>
