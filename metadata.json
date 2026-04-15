@@ -1,0 +1,6 @@
+{
+  "name": "Sezzle Calculator Test",
+  "description": "A full-stack calculator application with a React frontend and a backend microservice for arithmetic operations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
